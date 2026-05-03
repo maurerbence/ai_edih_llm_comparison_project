@@ -18,7 +18,7 @@ from typing import Any
 import streamlit as st
 
 from app.config import settings
-from app.rendering import render_plain_html
+from app.rendering import render_highlighted_html, render_plain_html
 from app.runner import Done, Stage, WorkerChunk, stream_pipeline, to_sync_iterator
 from app.schema import FindingSet, PipelineResult, TextFinding
 
@@ -99,10 +99,7 @@ _AUTH_HINTS = ("invalid_api_key", "incorrect api key", "authentication")
 def _friendly_message(leaves: list[BaseException]) -> str | None:
     blob = " ".join(str(e) for e in leaves).lower()
     if any(h in blob for h in _MODEL_NOT_FOUND_HINTS):
-        return (
-            "One of the chosen models isn't available with your API key. "
-            "Try a different model from the dropdown."
-        )
+        return "One of the chosen models isn't available with your API key. Try a different model from the dropdown."
     if any(h in blob for h in _AUTH_HINTS):
         return "OpenAI rejected the API key. Check OPENAI_API_KEY in your .env."
     return None
@@ -112,9 +109,7 @@ def _friendly_message(leaves: list[BaseException]) -> str | None:
 
 
 def _cache() -> dict[tuple[str, str, str], PipelineResult]:
-    cache: dict[tuple[str, str, str], PipelineResult] = st.session_state.setdefault(
-        CACHE_KEY, {}
-    )
+    cache: dict[tuple[str, str, str], PipelineResult] = st.session_state.setdefault(CACHE_KEY, {})
     return cache
 
 
@@ -210,11 +205,7 @@ def _render_finding(f: TextFinding, model_a: str, model_b: str) -> None:
             body += f"\n\n_{f.rationale}_"
         st.success(body)
     elif f.label == "disagree":
-        body = (
-            f"**Models disagree** — {f.summary}"
-            f"\n\n- **{model_a}:** {f.quote_a}"
-            f"\n- **{model_b}:** {f.quote_b}"
-        )
+        body = f"**Models disagree** — {f.summary}\n\n- **{model_a}:** {f.quote_a}\n- **{model_b}:** {f.quote_b}"
         if f.rationale:
             body += f"\n\n_{f.rationale}_"
         st.error(body)
@@ -292,6 +283,19 @@ def _format_as_markdown(prompt: str, result: PipelineResult) -> str:
 # ── Result rendering ───────────────────────────────────────────────────────
 
 
+def _highlights_for_side(findings: FindingSet, side: str) -> list[tuple[str, str]]:
+    out: list[tuple[str, str]] = []
+    for f in findings.findings:
+        quote = f.quote_a if side == "a" else f.quote_b
+        if not quote:
+            continue
+        if f.label == "agree":
+            out.append((quote, AGREE_BG))
+        elif f.label == "disagree":
+            out.append((quote, DISAGREE_BG))
+    return out
+
+
 def _render_final(slot_a: Any, slot_b: Any, status: Any, result: PipelineResult, prompt: str) -> None:
     meta = result.metadata
     if meta.refusal_a or meta.refusal_b:
@@ -301,8 +305,10 @@ def _render_final(slot_a: Any, slot_b: Any, status: Any, result: PipelineResult,
         return
 
     status.empty()
-    slot_a.markdown(render_plain_html(result.answer_a), unsafe_allow_html=True)
-    slot_b.markdown(render_plain_html(result.answer_b), unsafe_allow_html=True)
+    highlights_a = _highlights_for_side(result.findings, "a")
+    highlights_b = _highlights_for_side(result.findings, "b")
+    slot_a.markdown(render_highlighted_html(result.answer_a, highlights_a), unsafe_allow_html=True)
+    slot_b.markdown(render_highlighted_html(result.answer_b, highlights_b), unsafe_allow_html=True)
     _render_findings_section(result, prompt)
 
 
@@ -369,9 +375,7 @@ def main() -> None:
     # the comparison directly — the bare text_input + button combo requires
     # Cmd+Enter then click.
     with st.form("compare_form", clear_on_submit=False, border=False):
-        prompt = st.text_input(
-            "Your question", placeholder=DEFAULT_PROMPT_PLACEHOLDER, key="prompt_input"
-        )
+        prompt = st.text_input("Your question", placeholder=DEFAULT_PROMPT_PLACEHOLDER, key="prompt_input")
         submitted = st.form_submit_button("Compare", type="primary")
 
     if submitted and prompt.strip():

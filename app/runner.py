@@ -168,9 +168,7 @@ def _dedupe_consecutive_sentences(text: str) -> str:
 # ── ADK runner glue ────────────────────────────────────────────────────────
 
 
-async def _run_adk_pipeline(
-    prompt: str, model_a: str, model_b: str
-) -> AsyncIterator[tuple[str, object]]:
+async def _run_adk_pipeline(prompt: str, model_a: str, model_b: str) -> AsyncIterator[tuple[str, object]]:
     """Drive the ADK pipeline; yield ('event', event) for streaming and
     ('done', state_dict) at the end."""
     pipeline = build_pipeline(model_a, model_b)
@@ -221,9 +219,7 @@ async def stream_pipeline(
     refusal_a = _looks_like_refusal(answer_a)
     refusal_b = _looks_like_refusal(answer_b)
     if refusal_a or refusal_b:
-        yield Done(
-            result=_build_refusal_result(model_a, model_b, answer_a, answer_b, refusal_a, refusal_b)
-        )
+        yield Done(result=_build_refusal_result(model_a, model_b, answer_a, answer_b, refusal_a, refusal_b))
         return
 
     yield Stage(name="judging")

@@ -45,9 +45,7 @@ def test_factual_agreement_paris() -> None:
         MODEL_A,
         MODEL_B,
     )
-    findings_text = " ".join(
-        f"{f.summary} {f.quote_a} {f.quote_b}".lower() for f in result.findings.findings
-    )
+    findings_text = " ".join(f"{f.summary} {f.quote_a} {f.quote_b}".lower() for f in result.findings.findings)
     assert "paris" in findings_text, f"expected a Paris finding; got: {result.findings.findings}"
     # The judge should label at least one finding as agree on Paris.
     agreed = [f for f in result.findings.findings if f.label == "agree"]
@@ -62,8 +60,5 @@ def test_population_question_produces_findings() -> None:
         MIXED_MODEL_B,
     )
     # We expect Paris agreement plus possibly a population-related finding.
-    has_paris_finding = any(
-        "paris" in (f.summary + f.quote_a + f.quote_b).lower()
-        for f in result.findings.findings
-    )
+    has_paris_finding = any("paris" in (f.summary + f.quote_a + f.quote_b).lower() for f in result.findings.findings)
     assert has_paris_finding, "expected at least one finding touching Paris"

@@ -41,10 +41,7 @@ def test_looks_like_refusal_does_not_misfire_on_real_answers(answer: str) -> Non
 
 
 def test_dedupe_collapses_adjacent_identical_sentence() -> None:
-    text = (
-        "Neil Armstrong walked on the Moon."
-        "Neil Armstrong walked on the Moon. Buzz Aldrin followed him."
-    )
+    text = "Neil Armstrong walked on the Moon.Neil Armstrong walked on the Moon. Buzz Aldrin followed him."
     out = _dedupe_consecutive_sentences(text)
     assert out.count("Neil Armstrong walked on the Moon.") == 1
     assert "Buzz Aldrin followed him." in out
@@ -52,20 +49,14 @@ def test_dedupe_collapses_adjacent_identical_sentence() -> None:
 
 def test_dedupe_collapses_when_duplicates_separated_by_newline() -> None:
     """Models sometimes emit duplicates with a newline between them."""
-    text = (
-        "Neil Armstrong walked on the Moon.\n"
-        "Neil Armstrong walked on the Moon. Buzz Aldrin followed him."
-    )
+    text = "Neil Armstrong walked on the Moon.\nNeil Armstrong walked on the Moon. Buzz Aldrin followed him."
     out = _dedupe_consecutive_sentences(text)
     assert out.count("Neil Armstrong walked on the Moon.") == 1
     assert "Buzz Aldrin followed him." in out
 
 
 def test_dedupe_collapses_when_duplicates_separated_by_space() -> None:
-    text = (
-        "Neil Armstrong walked on the Moon. "
-        "Neil Armstrong walked on the Moon. Buzz Aldrin followed him."
-    )
+    text = "Neil Armstrong walked on the Moon. Neil Armstrong walked on the Moon. Buzz Aldrin followed him."
     out = _dedupe_consecutive_sentences(text)
     assert out.count("Neil Armstrong walked on the Moon.") == 1
     assert "Buzz Aldrin followed him." in out

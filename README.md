@@ -137,7 +137,6 @@ Override any field via environment variable (case-insensitive).
 | --------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `OPENAI_API_KEY`      | _required_                                                                         | Authenticates all OpenAI calls.                                          |
 | `JUDGE_MODEL`         | `gpt-5`                                                                            | Model used for the holistic judge.                                       |
-| `JUDGE_TEMPERATURE`   | `0.0`                                                                              | Sampling temperature (auto-dropped for gpt-5, which only supports `1`).  |
 | `AVAILABLE_MODELS`    | `gpt-5,gpt-5-mini,gpt-5-nano,gpt-4o,gpt-4o-mini,gpt-4.1,gpt-4.1-mini,gpt-4.1-nano` | Models offered in the UI dropdowns.                                      |
 | `LANGFUSE_PUBLIC_KEY` | _unset_                                                                            | Enables Langfuse tracing if set with secret.                             |
 | `LANGFUSE_SECRET_KEY` | _unset_                                                                            | Required alongside the public key.                                       |
