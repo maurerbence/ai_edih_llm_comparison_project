@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+
+# Caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.claude
+.playwright-mcp
+
+# uv / venv (uv.lock IS committed)
+.venv/
+
+# Environment
+.env
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+docs/skills/*

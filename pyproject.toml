@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "model-diff"
+version = "0.1.0"
+description = "Streamlit chatbot that compares two OpenAI models side-by-side and color-codes agreement/disagreement."
+requires-python = ">=3.11"
+dependencies = [
+    "google-adk>=0.4.0",
+    # Pinned to 2.x: LiteLLM's Langfuse callback integration reads
+    # `langfuse.version.__version__`, which the 3.x/4.x rewrite removed.
+    "langfuse>=2.50.0,<3.0",
+    "litellm>=1.50.0",
+    "openai>=1.50.0",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.4",
+    "streamlit>=1.36.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.11",
+    "pytest>=8.0",
+    "ruff>=0.6.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.uv]
+package = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # bugbear
+    "UP",  # pyupgrade
+    "N",   # naming
+    "RUF", # ruff-specific
+]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "google.adk.*",
+    "google.genai.*",
+    "litellm.*",
+    "streamlit.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -m 'not evals'"
+markers = [
+    "evals: end-to-end pipeline checks that hit the OpenAI API. Skipped by default; run with `pytest -m evals`.",
+]
